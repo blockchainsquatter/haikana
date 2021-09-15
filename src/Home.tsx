@@ -11,6 +11,11 @@ import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletDialogButton } from "@solana/wallet-adapter-material-ui";
 
+import movie from './movie.gif'
+import Particles from "react-tsparticles";
+import React, { Component } from 'react';
+import background_img from './stars1.gif'
+
 import {
   CandyMachine,
   awaitTransactionSignatureConfirmation,
@@ -36,11 +41,103 @@ export interface HomeProps {
   txTimeout: number;
 }
 
+const fStyle = { color: 'white' };
+
+class App extends Component {
+  render() {
+    return (
+      <Particles
+        id="tsparticles"
+        options={{
+          background: {
+            color: {
+              value: "#0d47a1",
+            },
+          },
+          fpsLimit: 60,
+          interactivity: {
+            detectsOn: "canvas",
+            events: {
+              onClick: {
+                enable: true,
+                mode: "push",
+              },
+              onHover: {
+                enable: true,
+                mode: "repulse",
+              },
+              resize: true,
+            },
+            modes: {
+              bubble: {
+                distance: 400,
+                duration: 2,
+                opacity: 0.8,
+                size: 40,
+              },
+              push: {
+                quantity: 4,
+              },
+              repulse: {
+                distance: 200,
+                duration: 0.4,
+              },
+            },
+          },
+          particles: {
+            color: {
+              value: "#ffffff",
+            },
+            links: {
+              color: "#ffffff",
+              distance: 150,
+              enable: true,
+              opacity: 0.5,
+              width: 1,
+            },
+            collisions: {
+              enable: true,
+            },
+            move: {
+              direction: "none",
+              enable: true,
+              outMode: "bounce",
+              random: false,
+              speed: 6,
+              straight: false,
+            },
+            number: {
+              density: {
+                enable: true,
+                value_area: 800,
+              },
+              value: 80,
+            },
+            opacity: {
+              value: 0.5,
+            },
+            shape: {
+              type: "circle",
+            },
+            size: {
+              random: true,
+              value: 5,
+            },
+          },
+          detectRetina: true,
+        }
+      }
+      />
+    );
+  }
+}
+
 const Home = (props: HomeProps) => {
   const [balance, setBalance] = useState<number>();
   const [isActive, setIsActive] = useState(false); // true when countdown completes
   const [isSoldOut, setIsSoldOut] = useState(false); // true when items remaining is zero
   const [isMinting, setIsMinting] = useState(false); // true when user got to press MINT
+  const [itemsRemaining, setItemsRemaining] = useState(0);
 
   const [alertState, setAlertState] = useState<AlertState>({
     open: false,
@@ -160,55 +257,81 @@ const Home = (props: HomeProps) => {
 
   return (
     <main>
-      {wallet.connected && (
-        <p>Address: {shortenAddress(wallet.publicKey?.toBase58() || "")}</p>
-      )}
+      <div style={{ backgroundImage: `url(${background_img})` }}>
+      
+      <div className="App">
+        <header className="App-header">
+          <h1>
+            Haikana
+          </h1>
+          <div className="header-text">
+            AI generated Haikus on Solana!
+          </div>
+          <div className="wallet-info">
 
-      {wallet.connected && (
-        <p>Balance: {(balance || 0).toLocaleString()} SOL</p>
-      )}
 
-      <MintContainer>
-        {!wallet.connected ? (
-          <ConnectButton>Connect Wallet</ConnectButton>
-        ) : (
-          <MintButton
-            disabled={isSoldOut || isMinting || !isActive}
-            onClick={onMint}
-            variant="contained"
-          >
-            {isSoldOut ? (
-              "SOLD OUT"
-            ) : isActive ? (
-              isMinting ? (
-                <CircularProgress />
-              ) : (
-                "MINT"
-              )
-            ) : (
-              <Countdown
-                date={startDate}
-                onMount={({ completed }) => completed && setIsActive(true)}
-                onComplete={() => setIsActive(true)}
-                renderer={renderCounter}
-              />
+            {wallet.connected && (
+              <p>Address: {shortenAddress(wallet.publicKey?.toBase58() || "")}</p>
             )}
-          </MintButton>
-        )}
-      </MintContainer>
 
-      <Snackbar
-        open={alertState.open}
-        autoHideDuration={6000}
-        onClose={() => setAlertState({ ...alertState, open: false })}
-      >
-        <Alert
-          onClose={() => setAlertState({ ...alertState, open: false })}
-          severity={alertState.severity}
-        >
-          {alertState.message}
-        </Alert>
-      </Snackbar>
+            {wallet.connected && (
+              <p>Balance: {(balance || 0).toLocaleString()} SOL</p>
+            )}
+
+            <div className="mint-container">
+              <MintContainer>
+                {!wallet.connected ? (
+                  <ConnectButton>Connect Wallet</ConnectButton>
+                ) : (
+                  <div>
+                    <MintButton
+                      disabled={isSoldOut || isMinting || !isActive}
+                      onClick={onMint}
+                      variant="contained"
+                    >
+                      {isSoldOut ? (
+                        "SOLD OUT"
+                      ) : isActive ? (
+                        isMinting ? (
+                          <CircularProgress />
+                        ) : (
+                          "MINT"
+                        )
+                      ) : (
+                        <div className="countdown">
+                          <Countdown
+                            date={startDate}
+                            onMount={({ completed }) => completed && setIsActive(true)}
+                            onComplete={() => setIsActive(true)}
+                            renderer={renderCounter}
+                          />
+                        </div>
+                      )}
+                    </MintButton>
+                    <div className="items-remaining">{itemsRemaining} / 245 Available</div>
+                  </div>
+                )}
+              </MintContainer>
+            </div>
+          </div>
+
+          <img src={movie} />
+
+          <Snackbar
+            open={alertState.open}
+            autoHideDuration={6000}
+            onClose={() => setAlertState({ ...alertState, open: false })}
+          >
+            <Alert
+              onClose={() => setAlertState({ ...alertState, open: false })}
+              severity={alertState.severity}
+            >
+              {alertState.message}
+            </Alert>
+          </Snackbar>
+        </header>
+      </div>
+      </div>
     </main>
   );
 };
