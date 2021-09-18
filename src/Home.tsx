@@ -11,6 +11,15 @@ import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletDialogButton } from "@solana/wallet-adapter-material-ui";
 
+import { makeStyles } from '@material-ui/core/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import TwitterIcon from '@material-ui/icons/Twitter';
+
+import Discord from './discord_logo.png';
+
 import movie from './movie.gif'
 import background_img from './stars1.gif'
 
@@ -29,6 +38,23 @@ const CounterText = styled.span``; // add your styles here
 const MintContainer = styled.div``; // add your styles here
 
 const MintButton = styled(Button)``; // add your styles here
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '50%',
+  },
+  heading: {
+    fontSize: theme.typography.pxToRem(24),
+    fontWeight: theme.typography.fontWeightRegular,
+    color: 'gray'
+  },
+  expandedPanel: {
+    color: 'gray',
+    backgroundColor: 'gray',
+    background: 'gray'
+  }
+
+}));
 
 export interface HomeProps {
   candyMachineId: anchor.web3.PublicKey;
@@ -162,6 +188,8 @@ const Home = (props: HomeProps) => {
     })();
   }, [wallet, props.candyMachineId, props.connection]);
 
+  const classes = useStyles();
+
   return (
     <main>
       <div style={{ backgroundImage: `url(${background_img})` }}>
@@ -172,7 +200,7 @@ const Home = (props: HomeProps) => {
             Haikana
           </h1>
           <div className="header-text">
-            AI generated Haikus on Solana!
+            The first generative Haikus on Solana!
           </div>
           <div className="wallet-info">
 
@@ -215,14 +243,31 @@ const Home = (props: HomeProps) => {
                         </div>
                       )}
                     </MintButton>
-                    <div className="items-remaining">{itemsRemaining} / 245 Available</div>
+                    {isActive? (
+                      <div className="items-remaining">{itemsRemaining} / 245 Available</div>
+                    ) : (
+                      ""
+                    )}
+                    
+                    <div className="countdown">
+                          <Countdown
+                            date={startDate}
+                            onMount={({ completed }) => completed && setIsActive(true)}
+                            onComplete={() => setIsActive(true)}
+                            renderer={renderCounter}
+                          />
+                        </div>
                   </div>
                 )}
               </MintContainer>
             </div>
+            &nbsp;   
           </div>
 
-          <img src={movie} alt="Haiku Flipbook"/>
+          <div>    &nbsp;   
+          <img src={movie} alt="Haiku Flipbook"/>  
+          </div>
+
 
           <Snackbar
             open={alertState.open}
@@ -236,6 +281,80 @@ const Home = (props: HomeProps) => {
               {alertState.message}
             </Alert>
           </Snackbar>
+
+          {/* <div className="accordians"> */}
+          <div className={classes.root} id="accordian">
+          &nbsp; 
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+          >
+            <div className="accordian-heading" style={{fontSize:"26px", color:'black'}}><b>FAQ</b></div>
+          </AccordionSummary>
+          <AccordionDetails>
+          <div className="faq-page">
+            <div className="question-text">
+              <div className="questions-text" style={{fontSize:"24px", color:'blue'}}><b>What is Haikana?</b></div>
+              <div className="answers-text">
+                Haikana is a collection of algorthmically generated Haikus.
+              </div>
+              <div className="questions-text" style={{fontSize:"24px", color:'blue'}}><b>How are the Haikus generated?</b></div>
+              <div className="answers-text">
+                The Haikus are created using a generative process.
+                For this collection, the algorithm that creates them is trained on a specific text.
+                The first person to tweet @realHaikana the text that was used will get a surprise ;). 
+              </div>
+              <div className="questions-text" style={{fontSize:"24px", color:'blue'}}><b>How much is a Haiku?</b></div>
+              <div className="answers-text">
+                0.5 SOL.
+              </div>
+              <div className="questions-text" style={{fontSize:"24px", color:'blue'}}><b>How many Haikus are there?</b></div>
+              <div className="answers-text">
+                There are 250 unique Haikus. 5 have been pre-minted, 3 of which will be used for giveaways.
+              </div>
+              <div className="questions-text" style={{fontSize:"24px", color:'blue'}}><b>Will there be more drops?</b></div>
+              <div className="answers-text">
+                Haikus will be used as a DAO token.
+                Haiku holders will vote on whether to mint further collections.
+                If a vote to mint a new collection is passed, holders will be able to vote on the text
+                to be used for the new collection and on the supply of the new collection.
+              </div>
+            </div>
+          </div>
+          </AccordionDetails>
+        </Accordion>
+        {/* </div> */}
+      </div>
+      &nbsp; 
+        <div className="social">
+              <a
+                className="App-link"
+                href="http://twitter.com/realHaikana"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <TwitterIcon style={{ fontSize: '40px'}} />
+              </a> 
+              {/*
+                <a
+                className="App-link"
+                href=""
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src={Discord}
+                alt="Discord" 
+                style={{
+                  width:'40px', 
+                  height:'40px',
+                  margin: 'auto',
+                  verticalAlign: 'top'
+                  }}/>
+              </a>
+                */}
+            </div>
         </header>
       </div>
       </div>
@@ -252,7 +371,7 @@ interface AlertState {
 const renderCounter = ({ days, hours, minutes, seconds, completed }: any) => {
   return (
     <CounterText>
-      {hours} hours, {minutes} minutes, {seconds} seconds
+      {days} days, {hours} hours, {minutes} minutes, {seconds} seconds
     </CounterText>
   );
 };
